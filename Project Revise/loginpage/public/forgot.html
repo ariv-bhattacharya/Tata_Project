@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <link rel="stylesheet" href="forgot_style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="wrapper">
+        <h1 id="form-title">Forgot Password</h1>
+
+        <p id="message-area" class="message-area"></p>
+
+        <form id="username-form" class="form-section">
+            <p class="form-description">Please enter your username (Email or Employee ID) to authenticate.</p>
+            <div class="input-box">
+                <input type="text" placeholder="Username" required id="usernameInput">
+                <i class='bx bxs-user'></i>
+            </div>
+            <button type="submit" class="btn">Authenticate</button>
+        </form>
+
+        <form id="password-form" class="form-section hidden">
+            <p class="form-description">Please enter and confirm your new password.</p>
+            <div class="input-box">
+                <input type="password" placeholder="New Password" required id="newPasswordInput">
+                <i class='bx bxs-lock-alt'></i>
+            </div>
+            <div class="input-box">
+                <input type="password" placeholder="Confirm Password" required id="confirmPasswordInput">
+                <i class='bx bxs-lock-alt'></i>
+            </div>
+            <button type="submit" class="btn">Reset Password</button>
+            <button type="button" id="backToUsernameBtn" class="btn secondary-btn">Back to Username</button>
+        </form>
+    </div>
+
+    <script>
+        const usernameForm = document.getElementById('username-form');
+        const passwordForm = document.getElementById('password-form');
+        const usernameInput = document.getElementById('usernameInput');
+        const newPasswordInput = document.getElementById('newPasswordInput');
+        const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+        const messageArea = document.getElementById('message-area');
+        const formTitle = document.getElementById('form-title');
+        const backToUsernameBtn = document.getElementById('backToUsernameBtn');
+
+        function showMessage(message, type) {
+            messageArea.textContent = message;
+            messageArea.className = 'message-area'; // Reset classes
+            if (type === 'success') {
+                messageArea.classList.add('success-message');
+                messageArea.style.color = 'green';
+            } else if (type === 'error') {
+                messageArea.classList.add('error-message');
+                messageArea.style.color = 'red';
+            } else {
+                 messageArea.style.color = ''; // Reset color for info/empty
+            }
+        }
+
+        usernameForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const username = usernameInput.value;
+            showMessage('Authenticating...', 'info');
+
+            try {
+                const response = await fetch('/forgot-password-authenticate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username }),
+                });
+
+                const textResponse = await response.text();
+
+                if (response.ok) {
+                    showMessage(textResponse, 'success');
+                    usernameForm.classList.add('hidden');
+                    passwordForm.classList.remove('hidden');
+                    formTitle.textContent = 'Reset Password';
+                    newPasswordInput.focus();
+                } else {
+                    showMessage(textResponse, 'error');
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showMessage('An unexpected error occurred during authentication.', 'error');
+            }
+        });
+
+        passwordForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const username = usernameInput.value; // Use the username from the first step
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (newPassword.length < 6) {
+                showMessage('Password must be at least 6 characters long.', 'error');
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                showMessage('New password and confirm password do not match.', 'error');
+                return;
+            }
+
+            showMessage('Resetting password...', 'info');
+
+            try {
+                const response = await fetch('/reset-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, newPassword, confirmPassword }),
+                });
+
+                const textResponse = await response.text();
+
+                if (response.ok) {
+                    showMessage(textResponse, 'success');
+                    passwordForm.classList.add('hidden');
+                    formTitle.textContent = 'Password Reset Complete';
+                    // Optional: add a link to login page or redirect
+                } else {
+                    showMessage(textResponse, 'error');
+                }
+            } catch (error) {
+                console.error('Password reset error:', error);
+                showMessage('An unexpected error occurred during password reset.', 'error');
+            }
+        });
+
+        backToUsernameBtn.addEventListener('click', function() {
+            passwordForm.classList.add('hidden'); 
+            usernameForm.classList.remove('hidden'); 
+            formTitle.textContent = 'Forgot Password'; 
+            showMessage('', ''); 
+            usernameInput.value = ''; 
+            newPasswordInput.value = '';
+            confirmPasswordInput.value = '';
+            usernameInput.focus(); 
+        });
+
+        window.onload = function() {
+            usernameForm.classList.remove('hidden'); 
+            passwordForm.classList.add('hidden'); 
+            usernameInput.focus(); 
+        };
+    </script>
+</body>
+</html>

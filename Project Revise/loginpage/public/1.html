@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registration Details</title>
+  <link rel="stylesheet" href="style2.css" />
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #333; 
+      margin: 0;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.1); 
+      padding: 30px;
+      border-radius: 10px;
+      backdrop-filter: blur(30px);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+
+    .container * {
+      color: #FFF;
+      margin-bottom: 10px;
+    }
+
+    .container h2 {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .container p {
+      background: none; 
+      padding: 0;
+      margin: 5px 0;
+      box-shadow: none;
+      display: block; 
+      text-align: center; 
+    }
+
+    .container p strong {
+      font-weight: normal; 
+    }
+
+    .container span {
+      font-weight: normal; 
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Registration Details</h2>
+    <p>Name: <span id="showFullName"></span></p>
+    <p>Email: <span id="showEmail"></span></p>
+    <p>Gender: <span id="showGender"></span></p>
+    <p>Country: <span id="showCountry"></span></p>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const firstName = localStorage.getItem("fname");
+      const lastName = localStorage.getItem("lname");
+      document.getElementById("showFullName").textContent = `${firstName || ''} ${lastName || ''}`.trim();
+
+      document.getElementById("showEmail").textContent = localStorage.getItem("email");
+      document.getElementById("showGender").textContent = localStorage.getItem("gender");
+      document.getElementById("showCountry").textContent = localStorage.getItem("country");
+    });
+  </script>
+</body>
+</html>

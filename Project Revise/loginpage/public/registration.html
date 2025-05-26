@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registration Form For Tata Motors</title>
+  <link rel="stylesheet" href="style2.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+</head>
+
+<body>
+  <div class="container">
+    <h2>Registration Form</h2>
+
+    <div class="form-container">
+      <form id="registrationForm">
+        <div class="input-name">
+          <i class="fa fa-user"></i>
+          <input type="text" id="fname" placeholder="First Name" class="name" required />
+          <span>
+            <i class="fa fa-user"></i>
+            <input type="text" id="lname" placeholder="Last Name" class="name" required />
+          </span>
+        </div>
+
+        <div class="input-name">
+          <i class="fa fa-envelope email"></i>
+          <input type="email" id="email" placeholder="Email" class="text-name" required />
+        </div>
+
+        <div class="input-name">
+            <i class="fa fa-id-badge"></i>
+            <input type="text" id="employeeId" placeholder="Employee ID" class="text-name" required />
+        </div>
+
+        <div class="input-name">
+          <i class="fa fa-lock"></i>
+          <input type="password" id="pass1" placeholder="Enter Password" class="text-name" required />
+        </div>
+
+        <div class="input-name">
+          <i class="fa fa-lock"></i>
+          <input type="password" id="pass2" placeholder="Confirm Password" class="text-name" required />
+        </div>
+
+        <div class="input-name">
+          <input type="radio" name="gender" value="Male" required />
+          <label>Male</label>
+
+          <input type="radio" name="gender" value="Female" required />
+          <label>Female</label>
+
+          <input type="radio" name="gender" value="Other" required />
+          <label>Other</label>
+        </div>
+
+        <div class="input-name">
+          <i class="fa fa-globe"></i>
+          <select id="country" class="country" required>
+            <option value="">Select Country</option>
+            <option value="France"> France </option>
+            <option value="Argentina"> Argentina </option>
+            <option value="Spain"> Spain </option>
+            <option value="Myanmar"> Myanmar </option>
+            <option value="Ireland"> Ireland </option>
+            <option value="Nepal"> Nepal </option>
+            <option value="Bhutan"> Bhutan</option>
+            <option value="Bangladesh"> Bangladesh</option>
+            <option value="Pakistan"> Pakistan</option>
+            <option value="Africa"> Africa</option>
+            <option value="Uganda"> Uganda </option>
+            <option value="United States Of America"> United States Of America </option>
+            <option value="New Zealand"> New Zealand </option>
+            <option value="Australia"> Australia </option>
+            <option value="India"> India </option>
+          </select>
+        </div>
+
+        <div class="input-name">
+          <input type="checkbox" class="check-button" id="terms" required />
+          <label>I Accept The Terms And Conditions</label>
+        </div>
+
+        <div class="input-name">
+          <input type="submit" class="button" value="Register" />
+        </div>
+        <p id="registrationMessage" style="margin-top: 15px; font-weight: bold; text-align: center;"></p>
+        <div class="register-link">
+          <p>Have an account?
+            <a href="loginpage.html">Login here.</a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const registrationForm = document.getElementById('registrationForm');
+    const registrationMessage = document.getElementById('registrationMessage');
+
+    registrationForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const firstname = document.getElementById("fname").value;
+        const lastname = document.getElementById("lname").value;
+        const email = document.getElementById("email").value;
+        const employeeId = document.getElementById("employeeId").value;
+        const password = document.getElementById("pass1").value;
+        const confirmpassword = document.getElementById("pass2").value;
+        const gender = document.querySelector('input[name="gender"]:checked')?.value;
+        const country = document.getElementById("country").value;
+        const termsAccepted = document.getElementById("terms").checked;
+
+        if (!gender) {
+            registrationMessage.textContent = 'Please select your gender.';
+            registrationMessage.style.color = 'red';
+            return;
+        }
+        if (!termsAccepted) {
+            registrationMessage.textContent = 'Please accept the terms and conditions.';
+            registrationMessage.style.color = 'red';
+            return;
+        }
+        if (password !== confirmpassword) {
+            registrationMessage.textContent = 'Passwords do not match.';
+            registrationMessage.style.color = 'red';
+            return;
+        }
+
+        try {
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    firstname,
+                    lastname,
+                    email,
+                    password,
+                    confirmpassword,
+                    employeeId,
+                    gender,
+                    country
+                }),
+            });
+
+            const textResponse = await response.text();
+
+            if (response.ok) {
+                registrationMessage.textContent = textResponse;
+                registrationMessage.style.color = 'green';
+                registrationForm.reset();
+                setTimeout(() => {
+                    window.location.href = 'loginpage.html';
+                }, 2000);
+            } else {
+                registrationMessage.textContent = textResponse;
+                registrationMessage.style.color = 'red';
+            }
+        } catch (error) {
+            console.error('Error during registration:', error);
+            registrationMessage.textContent = 'An unexpected error occurred.';
+            registrationMessage.style.color = 'red';
+        }
+    });
+  </script>
+</body>
+</html>
